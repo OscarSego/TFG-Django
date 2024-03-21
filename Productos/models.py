@@ -3,7 +3,6 @@ from django.contrib.auth.models import User
 from django.db import models
 from Usuarios.models import Usuario
 
-
 # Create your models here.
 class Categoria(models.Model):
     nombre = models.CharField(max_length=50)
@@ -60,3 +59,6 @@ class UserItemCarrito(models.Model):
 
     def __str__(self):
         return f"{self.cantidad}x {self.nombre_producto} en {self.carrito}"
+
+
+
