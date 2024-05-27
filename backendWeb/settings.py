@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_extensions',
     'corsheaders',
     'Usuarios',
     'Productos',
@@ -156,3 +157,8 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = "lamparasoporto@gmail.com"
 EMAIL_HOST_PASSWORD = "pxnf eziq bfyz ybuu"
+
+GRAPH_MODELS = {
+    'all_applications': True,
+    'group_models': True,
+}

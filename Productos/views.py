@@ -1,5 +1,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponseServerError
+
+from Usuarios.models import Usuario
 from .models import Producto, UserCarrito, UserItemCarrito
 from django.shortcuts import get_object_or_404
 from .serializers import ProductoSerializer, CarritoSerializer
@@ -9,36 +11,50 @@ import logging
 
 
 # Create your views here.
+# Función para obtener todos los productos
 def get_producto(request):
     try:
+        # Obtener todos los productos de la base de datos
         productos = Producto.objects.all()
     except Producto.DoesNotExist:
+        # Manejar el caso en que no se encuentren productos
         return JsonResponse({'error': 'Producto no encontrado'}, status=404)
 
+    # Serializar los productos y devolverlos como respuesta JSON
     serializer = ProductoSerializer(productos, many=True)
     return JsonResponse(serializer.data, safe=False)
 
+# Función para buscar un producto por nombre
 def buscar_producto(request, nombre):
     try:
+        # Buscar el producto por su nombre en la base de datos
         producto = Producto.objects.get(nombre=nombre)
         serializer = ProductoSerializer(producto)
         return JsonResponse(serializer.data)
     except ObjectDoesNotExist:
+        # Manejar el caso en que el producto no exista
         return JsonResponse({'error': 'El producto no existe'}, status=404)
     except Exception as e:
+        # Manejar otros errores internos del servidor
         return HttpResponseServerError({'error': 'Error interno del servidor: {}'.format(str(e))}, status=500)
 
+# Función para eliminar un producto del carrito
 def eliminar_producto_del_carrito(request, producto_id):
     producto = get_object_or_404(Producto, pk=producto_id)
     return JsonResponse({'mensaje': 'Producto eliminado del carrito correctamente'})
 
+# Configuración básica del registro de eventos
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+# Función para agregar un producto al carrito
 def agregar_al_carrito(request, producto_id):
     try:
         # Obtener el token de autorización del encabezado de la solicitud
         token = request.headers.get('authorization')
         logger.info('Token de autorización recibido: %s', token)
+        # Verificar si el token de autorización es válido
         if not token or not token.startswith('Bearer '):
             logger.error('Token de autorización inválido')
             return JsonResponse({'mensaje': 'Token de autorización inválido'}, status=401)
@@ -51,7 +67,8 @@ def agregar_al_carrito(request, producto_id):
         # Obtener el token real
         token_real = token_parts[1]
 
-        # Decodificar y validar el token
+        # Decodificar y validar el token JWT
+
         decoded_token = jwt.decode(token_real, settings.SECRET_KEY, algorithms=['HS256'])
         logger.info('Token decodificado: %s', decoded_token)
 
@@ -63,7 +80,7 @@ def agregar_al_carrito(request, producto_id):
             return JsonResponse({'mensaje': 'ID de usuario no encontrado en el token'}, status=401)
 
         # Obtener el usuario actual
-        usuario = email_id
+        usuario = get_object_or_404(Usuario, id=email_id)
 
         # Obtener o crear el carrito del usuario
         carrito, creado = UserCarrito.objects.get_or_create(email=usuario)
@@ -94,6 +111,7 @@ def agregar_al_carrito(request, producto_id):
         logger.error('Token de autorización expirado')
         return JsonResponse({'mensaje': 'Token de autorización expirado'}, status=401)
 
+# Función para visualizar el carrito del usuario
 def visualizar_carrito(request):
     try:
         # Obtener el token de autorización del encabezado de la solicitud
@@ -204,6 +222,7 @@ def aumentar_cantidad_producto(request, producto_id):
         # Si ocurre algún error, devolver una respuesta de error
         return JsonResponse({'error': str(e)}, status=500)
 
+# Función para aumentar la cantidad de un producto en el carrito
 def restar_producto_carrito(request, producto_id):
     try:
         # Obtener el token de autorización del encabezado de la solicitud
