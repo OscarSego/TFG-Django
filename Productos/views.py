@@ -1,5 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import JsonResponse, HttpResponseServerError
+from jwt import InvalidTokenError
 
 from Usuarios.models import Usuario
 from .models import Producto, UserCarrito, UserItemCarrito
@@ -110,6 +111,9 @@ def agregar_al_carrito(request, producto_id):
     except jwt.ExpiredSignatureError:
         logger.error('Token de autorización expirado')
         return JsonResponse({'mensaje': 'Token de autorización expirado'}, status=401)
+    except InvalidTokenError as e:
+        logger.error('Error al decodificar el token: %s', e)
+        return JsonResponse({'mensaje': 'Error al decodificar el token'}, status=401)
 
 # Función para visualizar el carrito del usuario
 def visualizar_carrito(request):

@@ -1,0 +1,33 @@
+# Ignorar archivos y directorios no necesarios para la construcción
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.log
+*.pot
+*.mo
+
+# Ignorar entornos virtuales de Python
+env/
+venv/
+.venv/
+
+# Ignorar directorios específicos del editor/IDE
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignorar archivos de control de versiones
+.git/
+.gitignore
+
+# Ignorar dependencias de Node.js
+node_modules/
+
+# Ignorar archivos y directorios de configuraciones locales
+.env
+.env.local
+.env.*.local

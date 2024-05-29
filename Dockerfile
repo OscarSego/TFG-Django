@@ -2,6 +2,9 @@ FROM python:3.12.0
 
 WORKDIR /app
 
+# Instalar Vim
+RUN apt-get update && apt-get install -y vim
+
 COPY requirements.txt ./
 COPY . .
 
